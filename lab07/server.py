@@ -1,8 +1,8 @@
 import socket
 
-game_map = {0:"rock", 1:"paper", 2:"scissors", 3:"lizard", 4:"Spock"}
-rps_table = [[-1, 1, 0],[1, -1, 2],[0, 2, -1]]
-rpsls_table = [[-1, 1, 0, 0, 4],[1, -1, 2, 3, 1], [0, 2, -1, 2, 4], [0, 3, 2, -1, 3], [4, 1, 4, 3, -1]]
+game_map = {0: "rock", 1: "paper", 2: "scissors", 3: "lizard", 4: "Spock"}
+rps_table = [[-1, 1, 0], [1, -1, 2], [0, 2, -1]]
+rpsls_table = [[-1, 1, 0, 0, 4], [1, -1, 2, 3, 1], [0, 2, -1, 2, 4], [0, 3, 2, -1, 3], [4, 1, 4, 3, -1]]
 
 IP = "127.0.0.1"
 port = 1234
@@ -13,20 +13,19 @@ UDPServerSocket.bind((IP, port))
 
 print(f"Server started on addres {IP}:{port}")
 
-# obsługa nadchodzących datagramów
 while True:
-    komA, adresA = UDPServerSocket.recvfrom(bufSize)
-    komB, adresB = UDPServerSocket.recvfrom(bufSize)
+    komA, addressA = UDPServerSocket.recvfrom(bufSize)    # zapisywanie graczy
+    komB, addressB = UDPServerSocket.recvfrom(bufSize)
 
-    player_a = adresA
-    player_b = adresB
+    player_a = addressA   # rozpoczynanie rozgrywki
+    player_b = addressB
     player_a_score = 0
     player_b_score = 0
-    i = 1
+    i = 0
 
     while True:
 
-        if adresA == player_a:
+        if addressA == player_a:      # rozpozpoznawanie graczy
             move_a = komA.decode()
             move_b = komB.decode()
         else:
@@ -35,7 +34,7 @@ while True:
 
         message = ""
 
-        if move_a == "end" or move_b == "end":
+        if move_a == "end" or move_b == "end":      # sprawdzanie komunikatów od graczy
             message = "end"
             UDPServerSocket.sendto(message.encode(), player_a)
             UDPServerSocket.sendto(message.encode(), player_b)
@@ -44,7 +43,7 @@ while True:
         else:
             winner = rps_table[int(move_a)][int(move_b)]
 
-            if winner == int(move_a):
+            if winner == int(move_a):       # sprawdzanie kto wygrał
                 message = f"{winner}"
                 player_a_score += 1
             elif winner == int(move_b):
@@ -53,10 +52,8 @@ while True:
             else:
                 message = f"draw"
 
-        # wysyłanie odpowiedzi
-        UDPServerSocket.sendto(message.encode(), player_a)
+        UDPServerSocket.sendto(message.encode(), player_a)      # wysyłanie odpowiedzi
         UDPServerSocket.sendto(message.encode(), player_b)
-        i+=1
-        komA, adresA = UDPServerSocket.recvfrom(bufSize)
-        komB, adresB = UDPServerSocket.recvfrom(bufSize)
-
+        i += 1
+        komA, addressA = UDPServerSocket.recvfrom(bufSize)
+        komB, addressB = UDPServerSocket.recvfrom(bufSize)

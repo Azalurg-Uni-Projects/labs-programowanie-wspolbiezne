@@ -3,17 +3,20 @@
 import random
 
 
-# todo: add a way to validate the x and y values
 def neighbors_amount(maze, x, y):
     amount = 0
-    if maze[x - 1][y] == 1:
-        amount += 1
-    if maze[x + 1][y] == 1:
-        amount += 1
-    if maze[x][y - 1] == 1:
-        amount += 1
-    if maze[x][y + 1] == 1:
-        amount += 1
+    if x > 0:
+        if maze[x - 1][y] == 1:
+            amount += 1
+    if x < len(maze) - 1:
+        if maze[x + 1][y] == 1:
+            amount += 1
+    if y > 0:
+        if maze[x][y - 1] == 1:
+            amount += 1
+    if y < len(maze) - 1:
+        if maze[x][y + 1] == 1:
+            amount += 1
     return amount
 
 
@@ -35,13 +38,13 @@ def create_maze(paths: int, size: int):
     possible = set()
     while len(occupied) < paths:
         oc = occupied[-1]
-        if oc[0] > 1:
+        if oc[0] > 0:
             possible.add((oc[0] - 1, oc[1]))
-        if oc[0] < size - 2:
+        if oc[0] < size - 1:
             possible.add((oc[0] + 1, oc[1]))
-        if oc[1] > 1:
+        if oc[1] > 0:
             possible.add((oc[0], oc[1] - 1))
-        if oc[1] < size - 2:
+        if oc[1] < size - 1:
             possible.add((oc[0], oc[1] + 1))
 
         possible = possible - set(occupied)
@@ -52,6 +55,8 @@ def create_maze(paths: int, size: int):
                 chosen = random.choice(list(possible))
             else:
                 break
+            if possible == set():
+                raise ValueError('Too many paths')
 
         occupied.append(chosen)
         maze[chosen[0]][chosen[1]] = 1
